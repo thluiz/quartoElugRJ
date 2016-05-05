@@ -1,24 +1,31 @@
 
 import {Socket, LongPoller} from "phoenix"
 
-class WebRTCChat {
-  static init() {
-    var recordRTC;
+var recordRTC;
     let socket = new Socket("/socket");
-    let channel = socket.channel("call", {})
+    socket.connect();
+    socket.onClose( e => console.log("Closed connection") );
+    socket.onOpen( ev => console.log("Opened connection", ev) );
+    socket.onError( ev => console.log("ERROR", ev) );
+
+
+    var channel = socket.channel("call", {});
+    channel.join()
+      .receive("ignore", () => console.log("auth error"))
+      .receive("ok", () => console.log("join ok"))
+      .receive("error", () => console.log("Connection error") );
+
     let localStream, peerConnection;
     let localVideo = document.getElementById("localVideo");
     let remoteVideo = document.getElementById("remoteVideo");
     let connectButton = document.getElementById("connect");
     let callButton = document.getElementById("call");
-    let hangupButton = document.getElementById("hangup");
-    let stopNplayButton = document.getElementById("stopNplay");
-    let audioRecorder = document.getElementById("audioRecorder");
-
+    let hangupButton = document.getElementById("hangup");                    
 
     function connect() {
       console.log("Requesting local stream");
-      navigator.getUserMedia({audio:true, video:true}, gotStream, error => {
+      
+      navigator.webkitGetUserMedia({audio:true, video:true}, gotStream, error => {
         console.log("getUserMedia error: ", error);
       });
     }
@@ -28,24 +35,6 @@ class WebRTCChat {
       localVideo.src = URL.createObjectURL(stream);
       localStream = stream;
       setupPeerConnection();
-
-      recordRTC = RecordRTC(stream, {
-        recorderType: StereoAudioRecorder,
-        type: "audio"
-      });
-      recordRTC.startRecording();
-    }
-
-    function stopNplay() {
-      recordRTC.stopRecording(function(audioURL) {
-        audioRecorder.src = audioURL;
-        audioRecorder.play();
-      });
-    }
-
-
-    function recorderProcess(e) {
-      var left = e.inputBuffer.getChannelData(0);
     }
 
     function convertFloat32ToInt16(buffer) {
@@ -74,6 +63,9 @@ class WebRTCChat {
         }]
       };
 
+      var RTCPeerConnection = window.RTCPeerConnection || window.mozRTCPeerConnection || 
+                              window.webkitRTCPeerConnection;
+      
       peerConnection = new RTCPeerConnection(servers);
       console.log("Created local peer connection");
       peerConnection.onicecandidate = gotLocalIceCandidate;
@@ -141,12 +133,6 @@ class WebRTCChat {
       console.log(error.name + ": " + error.message);
     }
 
-
-
-    channel.join()
-      .receive("ok", () => { console.log("Successfully joined call channel") })
-      .receive("error", () => { console.log("Unable to join") })
-
     channel.on("message", payload => {
       let message = JSON.parse(payload.body);
       if (message.sdp) {
@@ -162,10 +148,3 @@ class WebRTCChat {
     callButton.onclick = call;
     hangupButton.onclick = hangup;
     localVideo.muted = true;
-    stopNplayButton.onclick = stopNplay;
-  }
-}
-
-if($('#app').attr("app") == "WebRTCChat") {
-  $( () => WebRTCChat.init() );
-}
