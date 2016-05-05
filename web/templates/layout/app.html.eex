@@ -10,7 +10,7 @@
     <title>Hello QuartoElugRJ!</title>
     <link rel="stylesheet" href="<%= static_path(@conn, "/css/app.css") %>">
 
-    <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+    <script src="https://code.jquery.com/jquery-1.10.1.min.js"></script>
   </head>
 
   <body>
@@ -34,7 +34,7 @@
     </div> <!-- /container -->
 
 
-    <script src="http://chancejs.com/chance.min.js"></script>]
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chance/1.0.3/chance.min.js"></script>]
     <script src="<%= static_path(@conn, "/js/app.js") %>"></script>
 
   </body>
