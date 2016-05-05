@@ -4,7 +4,7 @@ defmodule QuartoElugRJ.UserSocket do
   ## Channels
   channel "rooms:*", QuartoElugRJ.RoomChannel
   channel "lobby:lobby", QuartoElugRJ.LobbyChannel
-
+  channel "call", QuartoElugRJ.WebRTCChannel
 
   ## Transports
   transport :websocket, Phoenix.Transports.WebSocket
