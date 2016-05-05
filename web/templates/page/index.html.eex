@@ -1,0 +1,21 @@
+<div id="messages"></div>
+<br/>
+
+<div class="col-md-4 form-group">
+  <label>Username</label>
+  <input id="username" type="text" class="form-control" />
+</div>
+
+<div class="col-md-6 form-group">
+  <label>Message</label>
+  <input id="message" type="text" class="form-control" />
+</div>
+
+<script src="http://chancejs.com/chance.min.js"></script>
+<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+
+<script>
+  var my_chance = new Chance();
+  $('#username').val(my_chance.first() + ' ' + my_chance.last());
+</script>
+
